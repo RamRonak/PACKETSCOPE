@@ -26,7 +26,7 @@ def dashboard():
     """Main network monitoring dashboard."""
     interfaces = get_network_interfaces()
     caps = get_system_capture_capabilities()
-    sessions = DatabaseManager.get_sessions(limit=20)
+    sessions = DatabaseManager.get_sessions(limit=100)
     current_session_id = request.args.get('session_id', type=int)
     
     return render_template(

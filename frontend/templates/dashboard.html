@@ -6,7 +6,7 @@
 <div class="container-fluid px-lg-4 py-4">
   
   <!-- Top Control Bar -->
-  <div class="cyber-card p-3 mb-4">
+  <div class="cyber-card p-3 mb-4" style="overflow: visible; z-index: 20;">
     <div class="row g-3 align-items-center">
       <!-- Interface Selector -->
       <div class="col-lg-3 col-md-4">
@@ -51,14 +51,20 @@
         <!-- View / Session Selector -->
         {% if sessions %}
         <div class="dropdown">
-          <button class="btn btn-cyber-outline dropdown-toggle px-3 py-2" type="button" data-bs-toggle="dropdown">
+          <button class="btn btn-cyber-outline dropdown-toggle px-3 py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-folder2-open"></i> Load Session
           </button>
-          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
-            {% for s in sessions[:10] %}
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow" style="min-width: 320px; max-height: 380px; overflow-y: auto; z-index: 1060;">
+            <li class="dropdown-header text-cyan font-mono small border-bottom border-secondary-subtle pb-1 mb-1">
+              Select Capture Session ({{ sessions|length }})
+            </li>
+            {% for s in sessions %}
             <li>
-              <a class="dropdown-item small font-mono" href="?session_id={{ s.id }}">
-                #{{ s.id }} - {{ s.name[:25] }} ({{ s.total_packets }} pkts)
+              <a class="dropdown-item font-mono small d-flex justify-content-between align-items-center py-2" href="?session_id={{ s.id }}">
+                <span class="text-truncate text-white me-2" style="max-width: 210px;" title="{{ s.name }}">
+                  #{{ s.id }} - {{ s.name }}
+                </span>
+                <span class="badge bg-secondary font-mono" style="font-size: 0.65rem;">{{ s.total_packets }} pkts</span>
               </a>
             </li>
             {% endfor %}
