@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Main Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+  
+  <!-- Top Control Bar -->
+  <div class="cyber-card p-3 mb-4">
+    <div class="row g-3 align-items-center">
+      <!-- Interface Selector -->
+      <div class="col-lg-3 col-md-4">
+        <label class="small text-muted font-mono mb-1 d-block"><i class="bi bi-hdd-network"></i> Network Interface</label>
+        <select class="form-select form-cyber w-100" id="interfaceSelect">
+          <option value="all">All / Default Active Interface</option>
+          {% for iface in interfaces %}
+          <option value="{{ iface.name }}" {% if iface.is_up and not iface.is_loopback %}selected{% endif %}>
+            {{ iface.name }} ({{ iface.ip_address }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filter Dropdown -->
+      <div class="col-lg-2 col-md-3">
+        <label class="small text-muted font-mono mb-1 d-block"><i class="bi bi-funnel"></i> Protocol Filter</label>
+        <select class="form-select form-cyber w-100" id="filterSelect">
+          <option value="ALL">All Protocols</option>
+          <option value="TCP">TCP Traffic</option>
+          <option value="UDP">UDP Traffic</option>
+          <option value="ICMP">ICMP (Ping)</option>
+          <option value="DNS">DNS (Port 53)</option>
+        </select>
+      </div>
+
+      <!-- Session Name / Notes -->
+      <div class="col-lg-3 col-md-5">
+        <label class="small text-muted font-mono mb-1 d-block"><i class="bi bi-tag"></i> Session Label</label>
+        <input type="text" class="form-control form-cyber" id="sessionNameInput" placeholder="Live Monitor Session 1">
+      </div>
+
+      <!-- Start / Stop Controls -->
+      <div class="col-lg-4 col-md-12 d-flex flex-wrap align-items-end justify-content-lg-end gap-2 pt-2 pt-lg-0">
+        <button class="btn btn-cyber-primary px-3 py-2 d-inline-flex align-items-center gap-2" id="startBtn" onclick="startCapture()">
+          <i class="bi bi-play-circle-fill"></i> Start Capture
+        </button>
+        <button class="btn btn-cyber-danger px-3 py-2 d-inline-flex align-items-center gap-2" id="stopBtn" onclick="stopCapture()" disabled>
+          <i class="bi bi-stop-circle-fill"></i> Stop Capture
+        </button>
+
+        <!-- View / Session Selector -->
+        {% if sessions %}
+        <div class="dropdown">
+          <button class="btn btn-cyber-outline dropdown-toggle px-3 py-2" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-folder2-open"></i> Load Session
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+            {% for s in sessions[:10] %}
+            <li>
+              <a class="dropdown-item small font-mono" href="?session_id={{ s.id }}">
+                #{{ s.id }} - {{ s.name[:25] }} ({{ s.total_packets }} pkts)
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Active Capture Status Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-3 border-top border-secondary-subtle">
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center">
+          <span class="pulse-dot offline" id="dashPulseDot"></span>
+          <span class="fw-bold font-mono small text-muted" id="dashStatusText">Status: Idle</span>
+        </div>
+        <div class="text-muted small font-mono">
+          <i class="bi bi-stopwatch"></i> Duration: <span class="text-white" id="dashDuration">00:00:00</span>
+        </div>
+        <div class="text-muted small font-mono d-none d-sm-inline">
+          <i class="bi bi-speedometer"></i> Rate: <span class="text-cyan" id="dashRate">0.0 pkts/s</span>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+        <div class="form-check form-switch mb-0 me-2">
+          <input class="form-check-input" type="checkbox" id="autoScrollCheck" checked>
+          <label class="form-check-label small text-muted font-mono" for="autoScrollCheck">Auto-Scroll</label>
+        </div>
+
+        <button class="btn btn-sm btn-outline-secondary font-mono" id="btnExportCsv" onclick="exportCurrentSession('csv')" disabled>
+          <i class="bi bi-filetype-csv"></i> CSV
+        </button>
+        <button class="btn btn-sm btn-outline-secondary font-mono" id="btnExportPdf" onclick="exportCurrentSession('pdf')" disabled>
+          <i class="bi bi-filetype-pdf"></i> PDF Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capture Statistics Grid -->
+  <div class="row g-3 mb-4">
+    <!-- Total Packets -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><i class="bi bi-stack text-cyan me-1"></i> Total Packets</div>
+        <div class="stat-value text-white" id="statTotalPackets">0</div>
+        <div class="small text-muted font-mono mt-1" id="statTotalBytes">0 B</div>
+      </div>
+    </div>
+    <!-- TCP -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><span class="badge-proto badge-tcp me-1">TCP</span> Packets</div>
+        <div class="stat-value text-cyan" id="statTcp">0</div>
+        <div class="small text-muted font-mono mt-1" id="statTcpPct">0% of total</div>
+      </div>
+    </div>
+    <!-- UDP -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><span class="badge-proto badge-udp me-1">UDP</span> Packets</div>
+        <div class="stat-value text-purple" id="statUdp">0</div>
+        <div class="small text-muted font-mono mt-1" id="statUdpPct">0% of total</div>
+      </div>
+    </div>
+    <!-- ICMP -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><span class="badge-proto badge-icmp me-1">ICMP</span> Packets</div>
+        <div class="stat-value text-amber" id="statIcmp">0</div>
+        <div class="small text-muted font-mono mt-1" id="statIcmpPct">0% of total</div>
+      </div>
+    </div>
+    <!-- DNS -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><span class="badge-proto badge-dns me-1">DNS</span> Packets</div>
+        <div class="stat-value text-blue" id="statDns">0</div>
+        <div class="small text-muted font-mono mt-1" id="statDnsPct">0% of total</div>
+      </div>
+    </div>
+    <!-- HTTP / Other -->
+    <div class="col-xl-2 col-md-4 col-6">
+      <div class="cyber-card p-3">
+        <div class="stat-label"><span class="badge-proto badge-http me-1">HTTP</span> / Other</div>
+        <div class="stat-value text-green" id="statHttpOther">0</div>
+        <div class="small text-muted font-mono mt-1" id="statAvgSize">Avg: 0 B</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traffic Analytics Charts (Chart.js) -->
+  <div class="row g-4 mb-4">
+    <!-- Chart 1: Protocol Distribution (Doughnut) -->
+    <div class="col-lg-4 col-md-6">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header">
+          <span class="fw-bold text-white small font-mono"><i class="bi bi-pie-chart text-cyan me-1"></i> Protocol Distribution</span>
+        </div>
+        <div class="cyber-card-body d-flex align-items-center justify-content-center" style="min-height: 260px;">
+          <canvas id="protocolChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Packets Captured Over Time (Line / Timeline) -->
+    <div class="col-lg-8 col-md-6">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-white small font-mono"><i class="bi bi-graph-up text-cyan me-1"></i> Traffic Activity Over Time</span>
+          <span class="badge bg-dark border border-secondary text-muted font-mono small">Packets / Time Slice</span>
+        </div>
+        <div class="cyber-card-body" style="min-height: 260px;">
+          <canvas id="timelineChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 3: Top Source IP Addresses -->
+    <div class="col-lg-4 col-md-6">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header">
+          <span class="fw-bold text-white small font-mono"><i class="bi bi-box-arrow-up-right text-cyan me-1"></i> Top Source Endpoints</span>
+        </div>
+        <div class="cyber-card-body" style="min-height: 220px;">
+          <canvas id="topSrcChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 4: Top Destination IP Addresses -->
+    <div class="col-lg-4 col-md-6">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header">
+          <span class="fw-bold text-white small font-mono"><i class="bi bi-box-arrow-in-down-left text-cyan me-1"></i> Top Destination Endpoints</span>
+        </div>
+        <div class="cyber-card-body" style="min-height: 220px;">
+          <canvas id="topDstChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 5: Packet Size Distribution Histogram -->
+    <div class="col-lg-4 col-md-12">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header">
+          <span class="fw-bold text-white small font-mono"><i class="bi bi-bar-chart-steps text-cyan me-1"></i> Packet Size Distribution</span>
+        </div>
+        <div class="cyber-card-body" style="min-height: 220px;">
+          <canvas id="sizeDistChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Packet Stream Table -->
+  <div class="cyber-card">
+    <div class="cyber-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-bold text-white small font-mono"><i class="bi bi-table text-cyan me-1"></i> Captured Packet Stream</span>
+        <span class="badge bg-dark border border-secondary font-mono text-cyan" id="tablePacketCount">0 Packets</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <input type="text" class="form-control form-cyber form-control-sm" id="searchTableInput" placeholder="Quick search IP/info..." style="width: 220px;" onkeyup="filterLiveTable()">
+        <a href="{{ url_for('views.inspector') }}" class="btn btn-sm btn-cyber-outline" id="btnDeepInspect">
+          <i class="bi bi-search me-1"></i> Full Inspector
+        </a>
+      </div>
+    </div>
+
+    <div class="table-responsive" style="max-height: 480px; overflow-y: auto;" id="tableContainer">
+      <table class="table table-cyber table-hover align-middle" id="packetTable">
+        <thead>
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th style="width: 140px;">Time</th>
+            <th>Source IP</th>
+            <th>Destination IP</th>
+            <th style="width: 90px;">Protocol</th>
+            <th style="width: 80px;">Src Port</th>
+            <th style="width: 80px;">Dst Port</th>
+            <th style="width: 80px;">Length</th>
+            <th>Information</th>
+            <th style="width: 80px;" class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody id="packetTableBody">
+          <tr>
+            <td colspan="10" class="text-center py-5 text-muted">
+              <i class="bi bi-radar fs-1 d-block mb-2 text-cyan"></i>
+              No network packets captured yet.<br>
+              Click <strong>Start Capture</strong> or select an authorized network interface to begin.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Packet Quick Detail Modal -->
+<div class="modal fade" id="packetDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content cyber-card" style="border: 1px solid var(--neon-blue);">
+      <div class="modal-header border-secondary-subtle">
+        <h5 class="modal-title font-mono text-cyan" id="modalTitle">Packet Inspection</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Rendered via JS -->
+      </div>
+      <div class="modal-footer border-secondary-subtle">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" class="btn btn-sm btn-cyber-primary" id="modalInspectBtn">Open in Full Inspector</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const INITIAL_SESSION_ID = {{ selected_session_id or 'null' }};
+</script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

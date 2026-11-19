@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Network Traffic Analyzer & Protocol Inspector{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 text-center position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.08) 0%, rgba(6, 9, 17, 0) 70%);">
+  <div class="container py-lg-4">
+    <!-- Brand badge -->
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-4 rounded-pill border" style="background: rgba(15, 23, 42, 0.6); border-color: var(--border-color) !important;">
+      <span class="pulse-dot {% if capabilities.pcap_driver_installed %}online{% else %}text-amber{% endif %}"></span>
+      <span class="small font-mono text-cyan">System Status: {{ capabilities.message }}</span>
+    </div>
+
+    <!-- Heading -->
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <h1 class="display-4 fw-extrabold text-white mb-3" style="letter-spacing: -1px;">
+          Understand Every Packet.<br>
+          <span style="background: linear-gradient(135deg, #00f0ff 0%, #38bdf8 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            See Your Network Clearly.
+          </span>
+        </h1>
+        <p class="lead text-secondary mb-4 mx-auto" style="max-width: 720px;">
+          <strong>PACKETSCOPE</strong> is a professional cybersecurity traffic analyzer and protocol inspection engine.
+          Capture authorized live network traffic, dissect protocol layers in real time, analyze PCAP captures, and inspect packet structures down to the byte.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+          <a href="{{ url_for('views.dashboard') }}" class="btn btn-lg btn-cyber-primary px-4 py-2 d-inline-flex align-items-center gap-2 shadow">
+            <i class="bi bi-broadcast"></i> Start Monitoring
+          </a>
+          <a href="{{ url_for('views.pcap_analysis') }}" class="btn btn-lg btn-cyber-outline px-4 py-2 d-inline-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-code"></i> Analyze PCAP
+          </a>
+          <a href="{{ url_for('views.education') }}" class="btn btn-lg btn-outline-secondary px-4 py-2 d-inline-flex align-items-center gap-2">
+            <i class="bi bi-mortarboard"></i> Learn Networking
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Quick Stats Counter Banner -->
+    <div class="row g-3 justify-content-center mt-2">
+      <div class="col-6 col-md-3">
+        <div class="cyber-card p-3 text-center">
+          <i class="bi bi-hdd-network fs-3 text-cyan mb-1"></i>
+          <div class="stat-value text-white">{{ interfaces|length }}</div>
+          <div class="stat-label">Interfaces Detected</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="cyber-card p-3 text-center">
+          <i class="bi bi-layers fs-3 text-blue mb-1"></i>
+          <div class="stat-value text-white">7+</div>
+          <div class="stat-label">Protocols Decoded</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="cyber-card p-3 text-center">
+          <i class="bi bi-shield-check fs-3 text-green mb-1"></i>
+          <div class="stat-value text-white">Safe</div>
+          <div class="stat-label">Sanitized Inspection</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="cyber-card p-3 text-center">
+          <i class="bi bi-filetype-pdf fs-3 text-amber mb-1"></i>
+          <div class="stat-value text-white">PDF/CSV</div>
+          <div class="stat-label">Report Generation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Features Section -->
+<section class="py-5 border-top border-bottom" style="border-color: var(--border-color) !important; background: rgba(11, 17, 32, 0.4);">
+  <div class="container py-lg-3">
+    <div class="text-center mb-5">
+      <h6 class="text-uppercase text-cyan fw-bold font-mono letter-spacing-1">Engineering Capabilities</h6>
+      <h2 class="fw-bold text-white">Built for Security Engineers & Network Analysts</h2>
+      <p class="text-muted mx-auto" style="max-width: 600px;">
+        High performance Scapy-powered packet processing with an intuitive, modern cybersecurity interface.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Feature 1 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border-color);">
+            <i class="bi bi-activity fs-2 text-cyan"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Live Packet Capture</h4>
+          <p class="text-muted small mb-0">
+            Select authorized host network interfaces and capture live network traffic with custom filters for TCP, UDP, ICMP, DNS, or all IP datagrams.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3);">
+            <i class="bi bi-diagram-3 fs-2 text-purple"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Deep Header Dissection</h4>
+          <p class="text-muted small mb-0">
+            Inspect every protocol layer: Ethernet MACs, IPv4/IPv6 TTLs, TCP sequence numbers and flags, UDP lengths, ICMP codes, and DNS records.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+            <i class="bi bi-file-earmark-bar-graph fs-2 text-green"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Wireshark & PCAP Ready</h4>
+          <p class="text-muted small mb-0">
+            Seamlessly upload standard Wireshark/tcpdump PCAP files for offline analysis, or export capture sessions directly to CSV, PDF, and PCAP.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
+            <i class="bi bi-pie-chart fs-2 text-amber"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Interactive Traffic Analytics</h4>
+          <p class="text-muted small mb-0">
+            Dynamic Chart.js visualizations showing protocol distribution, traffic volume over time, top source/destination IPs, and packet size histograms.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);">
+            <i class="bi bi-shield-lock fs-2 text-cyan"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Privacy & Security Safeguards</h4>
+          <p class="text-muted small mb-0">
+            Educational safe mode automatically redacts authorization headers, session cookies, and passwords while preventing unsafe raw packet injection.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100 p-4">
+          <div class="rounded-3 p-3 d-inline-block mb-3" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);">
+            <i class="bi bi-mortarboard fs-2 text-red"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-2">Network Education Module</h4>
+          <p class="text-muted small mb-0">
+            Comprehensive learning section covering OSI layers, packet construction, TCP 3-way handshakes, ARP translation, and interactive knowledge quizzes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Supported Protocols Interactive Grid -->
+<section class="py-5">
+  <div class="container py-lg-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+      <div>
+        <h6 class="text-uppercase text-cyan fw-bold font-mono">Supported Protocols</h6>
+        <h2 class="fw-bold text-white mb-1">Dissect Every Major Network Protocol</h2>
+      </div>
+      <a href="{{ url_for('views.protocols') }}" class="btn btn-sm btn-cyber-outline mt-2 mt-md-0">
+        View Protocol Breakdown Guide <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-tcp mb-2">TCP</span>
+          <h5 class="text-white fw-bold mb-1">Transmission Control</h5>
+          <p class="text-muted small mb-2">Connection-oriented, reliable 3-way handshake with sequence & ack tracking.</p>
+          <span class="font-mono text-cyan small">Ports: 80, 443, 22, 21</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-udp mb-2">UDP</span>
+          <h5 class="text-white fw-bold mb-1">User Datagram</h5>
+          <p class="text-muted small mb-2">Connectionless, lightweight transport optimized for low latency.</p>
+          <span class="font-mono text-purple small">Ports: 53, 67, 123</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-icmp mb-2">ICMP</span>
+          <h5 class="text-white fw-bold mb-1">Control Message</h5>
+          <p class="text-muted small mb-2">Network diagnostics, ping echo requests, destination unreachable alerts.</p>
+          <span class="font-mono text-amber small">Types: 0 (Reply), 8 (Request)</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-dns mb-2">DNS</span>
+          <h5 class="text-white fw-bold mb-1">Domain Name System</h5>
+          <p class="text-muted small mb-2">Hostname resolution mapping human domains to IPv4 and IPv6 addresses.</p>
+          <span class="font-mono text-cyan small">Port: 53 (A, AAAA, MX)</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-http mb-2">HTTP</span>
+          <h5 class="text-white fw-bold mb-1">Hypertext Transfer</h5>
+          <p class="text-muted small mb-2">Web communication protocol with methods, headers, and status codes.</p>
+          <span class="font-mono text-green small">Port: 80, 8080</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-https mb-2">HTTPS / TLS</span>
+          <h5 class="text-white fw-bold mb-1">Secure Transport</h5>
+          <p class="text-muted small mb-2">Encrypted web transport; safe inspection without decryption tampering.</p>
+          <span class="font-mono text-purple small">Port: 443, 8443</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-arp mb-2">ARP</span>
+          <h5 class="text-white fw-bold mb-1">Address Resolution</h5>
+          <p class="text-muted small mb-2">Layer 2 broadcast protocol resolving IP addresses to physical MACs.</p>
+          <span class="font-mono text-amber small">EtherType: 0x0806</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="cyber-card p-3">
+          <span class="badge-proto badge-other mb-2">IPv4 / IPv6</span>
+          <h5 class="text-white fw-bold mb-1">Internet Protocol</h5>
+          <p class="text-muted small mb-2">Layer 3 logical addressing, routing, packet fragmentation, and TTLs.</p>
+          <span class="font-mono text-muted small">EtherType: 0x0800, 0x86dd</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick 1-Click Sample PCAP Launcher Section -->
+{% if samples %}
+<section class="py-5 border-top" style="border-color: var(--border-color) !important; background: rgba(15, 23, 42, 0.3);">
+  <div class="container">
+    <div class="row align-items-center mb-4">
+      <div class="col-md-8">
+        <h6 class="text-uppercase text-cyan fw-bold font-mono">Instant Demonstration Mode</h6>
+        <h3 class="fw-bold text-white mb-1">Explore Pre-Captured Network Scenarios</h3>
+        <p class="text-muted small mb-0">
+          Load standard PCAP captures in 1-click to immediately explore PacketScope's analytics and packet inspector.
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('views.pcap_analysis') }}" class="btn btn-sm btn-cyber-outline">
+          <i class="bi bi-upload me-1"></i> Upload Custom PCAP
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      {% for s in samples %}
+      <div class="col-md-4 col-sm-6">
+        <div class="cyber-card p-3 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="font-mono text-cyan fw-bold small">{{ s.filename }}</span>
+              <span class="badge bg-secondary font-mono" style="font-size: 0.7rem;">{{ s.size_kb }} KB</span>
+            </div>
+            <p class="text-muted small mb-3">{{ s.description }}</p>
+          </div>
+          <button class="btn btn-sm btn-cyber-outline w-100" onclick="loadSamplePCAP('{{ s.filename }}', this)">
+            <i class="bi bi-play-circle me-1"></i> Load & Analyze
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function loadSamplePCAP(filename, btn) {
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Loading...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/pcap/load-sample', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAlert(`Successfully loaded ${filename} (${data.total_packets} packets)`, 'success');
+      window.location.href = `/dashboard?session_id=${data.session_id}`;
+    } else {
+      showAlert(`Error: ${data.error}`, 'error');
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showAlert('Network error loading sample', 'error');
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+</script>
+{% endblock %}

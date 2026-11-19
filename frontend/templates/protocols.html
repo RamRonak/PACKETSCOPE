@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Protocol Analysis & Dissection Guide{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header Banner -->
+  <div class="cyber-card p-4 mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="rounded-3 p-3 d-inline-block" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border-color);">
+        <i class="bi bi-diagram-3 fs-1 text-cyan"></i>
+      </div>
+      <div>
+        <h6 class="text-uppercase text-cyan fw-bold font-mono mb-1">Network Engineering Knowledge Base</h6>
+        <h2 class="fw-bold text-white mb-1">Protocol Analysis & Header Dissection Guide</h2>
+        <p class="text-muted small mb-0">
+          In-depth technical breakdown of core networking protocols, packet structures, header fields, and detection signatures used by PacketScope.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Nav Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="#tcp" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-tcp me-1">TCP</span> Transmission Control</a>
+    <a href="#udp" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-udp me-1">UDP</span> User Datagram</a>
+    <a href="#icmp" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-icmp me-1">ICMP</span> Control Message</a>
+    <a href="#dns" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-dns me-1">DNS</span> Domain Name System</a>
+    <a href="#http" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-http me-1">HTTP/S</span> Web Communication</a>
+    <a href="#arp" class="btn btn-sm btn-cyber-outline"><span class="badge-proto badge-arp me-1">ARP</span> Address Resolution</a>
+  </div>
+
+  <!-- 1. TCP Section -->
+  <div class="cyber-card p-4 mb-4" id="tcp">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-tcp fs-6 mb-2">TCP</span>
+        <h3 class="text-white fw-bold mb-1">Transmission Control Protocol</h3>
+        <p class="text-muted small mb-0">Layer 4 (Transport) &bull; RFC 793, RFC 9293</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-cyan font-mono">Connection-Oriented</span>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <h5 class="text-cyan font-mono small text-uppercase fw-bold"><i class="bi bi-info-circle me-1"></i> Purpose & Reliability</h5>
+        <p class="text-secondary small">
+          TCP provides reliable, ordered, and error-checked delivery of a stream of octets between applications running on hosts communicating via an IP network.
+          It guarantees delivery through sequence numbers, acknowledgments (ACKs), timeouts, and retransmissions.
+        </p>
+        <h5 class="text-cyan font-mono small text-uppercase fw-bold mt-3"><i class="bi bi-shuffle me-1"></i> The 3-Way Handshake</h5>
+        <div class="p-3 rounded font-mono small text-secondary" style="background: #040711; border: 1px solid rgba(0, 240, 255, 0.2);">
+          Client ──────── SYN (Seq=x) ───────> Server<br>
+          Client <──── SYN-ACK (Seq=y, Ack=x+1) ──── Server<br>
+          Client ──────── ACK (Ack=y+1) ───────> Server
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="text-cyan font-mono small text-uppercase fw-bold"><i class="bi bi-flag me-1"></i> TCP Control Flags Breakdown</h5>
+        <div class="table-responsive">
+          <table class="table table-cyber table-sm font-mono small">
+            <thead>
+              <tr><th>Flag</th><th>Hex</th><th>Function in Network Traffic</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="text-cyan">SYN</td><td>0x02</td><td>Synchronize sequence numbers (initiate connection)</td></tr>
+              <tr><td class="text-green">ACK</td><td>0x10</td><td>Acknowledgment field is significant</td></tr>
+              <tr><td class="text-red">FIN</td><td>0x01</td><td>Finish connection (no more data from sender)</td></tr>
+              <tr><td class="text-amber">RST</td><td>0x04</td><td>Reset connection immediately (port closed/error)</td></tr>
+              <tr><td class="text-purple">PSH</td><td>0x08</td><td>Push data immediately to receiving application</td></tr>
+              <tr><td class="text-muted">URG</td><td>0x20</td><td>Urgent pointer field is significant</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packet Structure Diagram -->
+    <h5 class="text-cyan font-mono small text-uppercase fw-bold mb-2"><i class="bi bi-bounding-box me-1"></i> TCP Header Structure (20-60 Bytes)</h5>
+    <div class="p-3 rounded font-mono small text-cyan overflow-x-auto" style="background: #040711; border: 1px solid rgba(0, 240, 255, 0.2);">
+ 0                   1                   2                   3<br>
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|          Source Port          |       Destination Port        |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|                        Sequence Number                        |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|                    Acknowledgment Number                      |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|  Data |           |U|A|P|R|S|F|                               |<br>
+| Offset| Reserved  |R|C|S|S|Y|I|            Window             |<br>
+|       |           |G|K|H|T|N|N|                               |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|           Checksum            |         Urgent Pointer        |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    </div>
+
+    <div class="row g-2 mt-3 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Common Ports: <span class="text-white">80 (HTTP), 443 (HTTPS), 22 (SSH), 21 (FTP)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">Web browsing, SSH sessions, file transfers</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-cyan">IP Protocol #6 or TCP layer presence</span></div>
+    </div>
+  </div>
+
+  <!-- 2. UDP Section -->
+  <div class="cyber-card p-4 mb-4" id="udp">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-udp fs-6 mb-2">UDP</span>
+        <h3 class="text-white fw-bold mb-1">User Datagram Protocol</h3>
+        <p class="text-muted small mb-0">Layer 4 (Transport) &bull; RFC 768</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-purple font-mono">Connectionless</span>
+    </div>
+
+    <div class="row g-4 mb-3">
+      <div class="col-md-6">
+        <h5 class="text-purple font-mono small text-uppercase fw-bold"><i class="bi bi-info-circle me-1"></i> Purpose & Philosophy</h5>
+        <p class="text-secondary small">
+          UDP is a minimalist transport layer protocol that provides a connectionless datagram service without handshakes, sequence tracking, or retransmission.
+          It trades delivery guarantees for maximum throughput and minimal latency.
+        </p>
+        <h5 class="text-purple font-mono small text-uppercase fw-bold mt-3"><i class="bi bi-lightning-charge me-1"></i> Typical Use Cases</h5>
+        <ul class="text-secondary small ps-3">
+          <li><strong>Domain Name System (DNS)</strong> queries on port 53.</li>
+          <li><strong>Dynamic Host Configuration (DHCP)</strong> discover/offer on ports 67/68.</li>
+          <li><strong>Real-time Voice & Video Streaming (VoIP, WebRTC)</strong> where speed beats retransmissions.</li>
+          <li><strong>Network Time Protocol (NTP)</strong> on port 123 for clock synchronization.</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="text-purple font-mono small text-uppercase fw-bold mb-2"><i class="bi bi-bounding-box me-1"></i> UDP Header Structure (8 Bytes Fixed)</h5>
+        <div class="p-3 rounded font-mono small text-purple overflow-x-auto" style="background: #040711; border: 1px solid rgba(168, 85, 247, 0.2);">
+ 0                   1                   2                   3<br>
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|          Source Port          |       Destination Port        |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+<br>
+|            Length             |           Checksum            |<br>
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-2 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Common Ports: <span class="text-white">53 (DNS), 67/68 (DHCP), 123 (NTP), 161 (SNMP)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">DNS resolutions, video calling, live telemetry</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-purple">IP Protocol #17 or UDP layer presence</span></div>
+    </div>
+  </div>
+
+  <!-- 3. ICMP Section -->
+  <div class="cyber-card p-4 mb-4" id="icmp">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-icmp fs-6 mb-2">ICMP</span>
+        <h3 class="text-white fw-bold mb-1">Internet Control Message Protocol</h3>
+        <p class="text-muted small mb-0">Layer 3 (Network Diagnostic) &bull; RFC 792</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-amber font-mono">Diagnostic / Error</span>
+    </div>
+
+    <div class="row g-4 mb-3">
+      <div class="col-md-6">
+        <h5 class="text-amber font-mono small text-uppercase fw-bold"><i class="bi bi-info-circle me-1"></i> Purpose in Network Defense</h5>
+        <p class="text-secondary small">
+          ICMP is used by network devices (including routers and hosts) to send error messages and operational information indicating whether a requested service or host is reachable.
+          It does not carry application payload and is essential for utilities like <code>ping</code> and <code>traceroute</code>.
+        </p>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="text-amber font-mono small text-uppercase fw-bold mb-2">Core ICMP Types & Codes</h5>
+        <div class="table-responsive">
+          <table class="table table-cyber table-sm font-mono small">
+            <thead><tr><th>Type</th><th>Code</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="text-cyan">0</td><td>0</td><td>Echo Reply (Ping response)</td></tr>
+              <tr><td class="text-amber">8</td><td>0</td><td>Echo Request (Ping probe)</td></tr>
+              <tr><td class="text-red">3</td><td>1</td><td>Host Unreachable</td></tr>
+              <tr><td class="text-red">3</td><td>3</td><td>Port Unreachable</td></tr>
+              <tr><td class="text-purple">11</td><td>0</td><td>Time to Live (TTL) Exceeded in Transit</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-2 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Transport: <span class="text-white">Encapsulated directly in IP (no ports)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">Ping connectivity, Traceroute path discovery</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-amber">IP Protocol #1 or ICMP layer presence</span></div>
+    </div>
+  </div>
+
+  <!-- 4. DNS Section -->
+  <div class="cyber-card p-4 mb-4" id="dns">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-dns fs-6 mb-2">DNS</span>
+        <h3 class="text-white fw-bold mb-1">Domain Name System</h3>
+        <p class="text-muted small mb-0">Layer 7 (Application) &bull; RFC 1034, RFC 1035</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-cyan font-mono">Port 53 (UDP/TCP)</span>
+    </div>
+
+    <div class="row g-4 mb-3">
+      <div class="col-md-6">
+        <h5 class="text-cyan font-mono small text-uppercase fw-bold"><i class="bi bi-info-circle me-1"></i> How Resolution Works</h5>
+        <p class="text-secondary small">
+          DNS acts as the phonebook of the Internet, translating human-friendly names (e.g., <code>packetscope.local</code>) into numerical IP addresses (e.g., <code>142.250.190.46</code>).
+          Clients issue recursive queries to resolvers, which traverse the root, TLD, and authoritative nameservers.
+        </p>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="text-cyan font-mono small text-uppercase fw-bold mb-2">Primary DNS Record Types</h5>
+        <div class="table-responsive">
+          <table class="table table-cyber table-sm font-mono small">
+            <thead><tr><th>Type</th><th>Name</th><th>Maps To</th></tr></thead>
+            <tbody>
+              <tr><td class="text-cyan">A</td><td>IPv4 Host</td><td>32-bit IPv4 Address</td></tr>
+              <tr><td class="text-green">AAAA</td><td>IPv6 Host</td><td>128-bit IPv6 Address</td></tr>
+              <tr><td class="text-purple">CNAME</td><td>Canonical Name</td><td>Domain Alias</td></tr>
+              <tr><td class="text-amber">MX</td><td>Mail Exchange</td><td>Mail Server Domain</td></tr>
+              <tr><td class="text-white">TXT</td><td>Text Record</td><td>SPF, DKIM, verification</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-2 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Port: <span class="text-white">53 (UDP for queries, TCP for zone transfer/large responses)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">Resolving website domains, mail routing</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-cyan">Port 53 matching or DNS QR header signature</span></div>
+    </div>
+  </div>
+
+  <!-- 5. HTTP & HTTPS Section -->
+  <div class="cyber-card p-4 mb-4" id="http">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-http fs-6 mb-2">HTTP / HTTPS</span>
+        <h3 class="text-white fw-bold mb-1">Hypertext Transfer Protocol (Secure)</h3>
+        <p class="text-muted small mb-0">Layer 7 (Application) &bull; RFC 2616, RFC 7230, RFC 8446</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-green font-mono">Ports 80 & 443</span>
+    </div>
+
+    <div class="row g-4 mb-3">
+      <div class="col-md-6">
+        <h5 class="text-green font-mono small text-uppercase fw-bold"><i class="bi bi-file-code me-1"></i> HTTP (Cleartext Transport)</h5>
+        <p class="text-secondary small">
+          HTTP is an unencrypted request-response protocol. Requests feature ASCII verbs (<code>GET</code>, <code>POST</code>, <code>HEAD</code>), URI paths, and headers.
+          Responses return status codes like <code>200 OK</code>, <code>404 Not Found</code>, or <code>500 Internal Error</code>.
+          PacketScope safely sanitizes authorization tokens and passwords in cleartext payloads.
+        </p>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="text-purple font-mono small text-uppercase fw-bold"><i class="bi bi-shield-lock me-1"></i> HTTPS (TLS/SSL Encrypted)</h5>
+        <p class="text-secondary small">
+          HTTPS runs HTTP over a Transport Layer Security (TLS) tunnel. The client and server perform a cryptographic handshake to authenticate via X.509 certificates and negotiate symmetric session keys.
+          <strong>PacketScope ethical policy:</strong> Never attempts to decrypt or tamper with TLS traffic.
+        </p>
+      </div>
+    </div>
+
+    <div class="row g-2 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Ports: <span class="text-white">80, 8080 (HTTP) &bull; 443, 8443 (HTTPS)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">REST APIs, web apps, cloud services</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-green">HTTP header signatures or port matching</span></div>
+    </div>
+  </div>
+
+  <!-- 6. ARP Section -->
+  <div class="cyber-card p-4" id="arp">
+    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <span class="badge-proto badge-arp fs-6 mb-2">ARP</span>
+        <h3 class="text-white fw-bold mb-1">Address Resolution Protocol</h3>
+        <p class="text-muted small mb-0">Layer 2/3 (Link to Network Translation) &bull; RFC 826</p>
+      </div>
+      <span class="badge bg-dark border border-secondary text-amber font-mono">EtherType 0x0806</span>
+    </div>
+
+    <p class="text-secondary small mb-3">
+      ARP bridges the gap between Layer 3 logical IP addresses and Layer 2 physical hardware MAC addresses on a local broadcast domain.
+      When Host A wishes to send a packet to Host B on the same LAN, it broadcasts an ARP Request: <em>"Who has IP 192.168.1.1? Tell 192.168.1.100."</em>
+      Host B unicasts an ARP Reply: <em>"192.168.1.1 is at aa:bb:cc:dd:ee:ff."</em>
+    </p>
+
+    <div class="row g-2 pt-3 border-top border-secondary-subtle small font-mono">
+      <div class="col-md-4 text-muted">Scope: <span class="text-white">Local broadcast domain (not routable across Internet)</span></div>
+      <div class="col-md-4 text-muted">Example Use Case: <span class="text-white">LAN default gateway resolution</span></div>
+      <div class="col-md-4 text-muted">PacketScope ID: <span class="text-amber">Ethernet EtherType 0x0806 or ARP opcode</span></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

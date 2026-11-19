@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Packet Inspector{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+  
+  <!-- Inspector Top Filter Bar -->
+  <div class="cyber-card p-3 mb-4">
+    <div class="row g-2 align-items-center">
+      <!-- Session Selector -->
+      <div class="col-lg-3 col-md-6">
+        <label class="small text-muted font-mono mb-1"><i class="bi bi-folder2-open"></i> Select Session</label>
+        <select class="form-select form-cyber form-select-sm" id="inspectorSessionSelect" onchange="changeInspectorSession(this.value)">
+          {% if sessions %}
+            {% for s in sessions %}
+            <option value="{{ s.id }}" {% if s.id == selected_session_id %}selected{% endif %}>
+              #{{ s.id }} - {{ s.name[:25] }} ({{ s.total_packets }} pkts)
+            </option>
+            {% endfor %}
+          {% else %}
+            <option value="">No sessions found</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- Protocol Filter -->
+      <div class="col-lg-2 col-md-3 col-6">
+        <label class="small text-muted font-mono mb-1"><i class="bi bi-funnel"></i> Protocol</label>
+        <select class="form-select form-cyber form-select-sm" id="filterProtocol" onchange="applyFilters()">
+          <option value="ALL">All Protocols</option>
+          <option value="TCP">TCP</option>
+          <option value="UDP">UDP</option>
+          <option value="ICMP">ICMP</option>
+          <option value="DNS">DNS</option>
+          <option value="HTTP">HTTP</option>
+          <option value="ARP">ARP</option>
+        </select>
+      </div>
+
+      <!-- IP Filter -->
+      <div class="col-lg-2 col-md-3 col-6">
+        <label class="small text-muted font-mono mb-1"><i class="bi bi-globe"></i> IP Address</label>
+        <input type="text" class="form-control form-cyber form-control-sm" id="filterIp" placeholder="e.g. 192.168.1.1" onkeyup="if(event.key==='Enter') applyFilters()">
+      </div>
+
+      <!-- Port Filter -->
+      <div class="col-lg-1 col-md-2 col-6">
+        <label class="small text-muted font-mono mb-1"><i class="bi bi-door-open"></i> Port</label>
+        <input type="number" class="form-control form-cyber form-control-sm" id="filterPort" placeholder="80" onkeyup="if(event.key==='Enter') applyFilters()">
+      </div>
+
+      <!-- Keyword Search -->
+      <div class="col-lg-2 col-md-4 col-6">
+        <label class="small text-muted font-mono mb-1"><i class="bi bi-search"></i> Search Info</label>
+        <input type="text" class="form-control form-cyber form-control-sm" id="filterSearch" placeholder="Query or flags..." onkeyup="if(event.key==='Enter') applyFilters()">
+      </div>
+
+      <!-- Buttons -->
+      <div class="col-lg-2 col-md-6 d-flex align-items-end gap-2 pt-2 pt-lg-0">
+        <button class="btn btn-sm btn-cyber-primary flex-grow-1" onclick="applyFilters()">
+          <i class="bi bi-funnel-fill"></i> Filter
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="clearFilters()" title="Reset Filters">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dual-Pane Inspector Layout -->
+  <div class="row g-4">
+    <!-- Left Pane: Packet Table -->
+    <div class="col-xl-7 col-lg-6">
+      <div class="cyber-card h-100">
+        <div class="cyber-card-header d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-white small font-mono">
+            <i class="bi bi-list-columns text-cyan me-1"></i> Packet Records 
+            <span class="badge bg-dark border border-secondary text-cyan ms-2" id="filteredCountBadge">0 / 0</span>
+          </span>
+          <div class="small text-muted font-mono">Click a row to inspect</div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 720px; overflow-y: auto;" id="inspectorTableContainer">
+          <table class="table table-cyber table-hover align-middle" id="inspectorTable">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 100px;">Time</th>
+                <th>Source IP</th>
+                <th>Destination IP</th>
+                <th style="width: 80px;">Proto</th>
+                <th style="width: 65px;">Sport</th>
+                <th style="width: 65px;">Dport</th>
+                <th style="width: 65px;">Len</th>
+                <th>Info</th>
+              </tr>
+            </thead>
+            <tbody id="inspectorTableBody">
+              <tr>
+                <td colspan="9" class="text-center py-5 text-muted">
+                  <div class="spinner-border spinner-border-sm text-cyan me-2"></div> Loading packets...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Pane: Deep Packet Dissection & Hex View -->
+    <div class="col-xl-5 col-lg-6">
+      <div class="cyber-card h-100 sticky-lg-top" style="top: 80px; z-index: 1000;">
+        <div class="cyber-card-header d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-white small font-mono">
+            <i class="bi bi-eye text-cyan me-1"></i> Packet Dissection
+            <span class="text-cyan ms-1" id="detailPktNum">#---</span>
+          </span>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.75rem;" id="btnCopyJson" onclick="copyPacketJson(this)">
+              <i class="bi bi-clipboard"></i> Copy JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="cyber-card-body" style="max-height: 720px; overflow-y: auto;" id="detailPaneBody">
+          <!-- Default placeholder before selection -->
+          <div class="text-center py-5 text-muted" id="detailEmptyState">
+            <i class="bi bi-fingerprint fs-1 d-block mb-3 text-cyan opacity-50"></i>
+            Select a packet from the left table to inspect layer-by-layer headers and payload.
+          </div>
+
+          <div id="detailContent" style="display: none;">
+            <!-- Summary Banner -->
+            <div class="p-3 mb-3 rounded-2" style="background: rgba(0, 240, 255, 0.05); border: 1px solid var(--border-color);">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge-proto" id="detailBadge">TCP</span>
+                <span class="font-mono text-muted small" id="detailTimestamp">2026-11-19 00:00:00</span>
+              </div>
+              <div class="row g-2 font-mono small">
+                <div class="col-6 text-muted">Length: <span class="text-white" id="detailLen">0 bytes</span></div>
+                <div class="col-6 text-muted">Flags: <span class="text-cyan" id="detailFlags">N/A</span></div>
+                <div class="col-12 text-muted">Summary: <span class="text-secondary" id="detailSummary"></span></div>
+              </div>
+            </div>
+
+            <!-- Layer-by-layer Dissection Accordion -->
+            <h6 class="text-uppercase text-cyan fw-bold font-mono small mb-2">Protocol Layer Breakdown</h6>
+            <div class="accordion accordion-cyber mb-4" id="layerAccordion">
+              <!-- Dynamically populated via inspector.js -->
+            </div>
+
+            <!-- Hexadecimal & ASCII Representation -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="text-uppercase text-cyan fw-bold font-mono small mb-0">
+                <i class="bi bi-binary me-1"></i> Raw Hex Dump & ASCII Preview
+              </h6>
+              <span class="badge bg-dark border border-secondary text-muted font-mono" style="font-size: 0.65rem;">Sanitized Safe Preview</span>
+            </div>
+            <div class="hex-dump-container mb-3" id="detailHexDump">
+              0000   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+            </div>
+
+            <!-- Sanitized ASCII Payload String -->
+            <div id="asciiPayloadSection" style="display: none;">
+              <h6 class="text-uppercase text-muted fw-bold font-mono small mb-1">Sanitized ASCII Payload</h6>
+              <div class="p-2 rounded font-mono text-secondary small" style="background: #040711; border: 1px solid rgba(255,255,255,0.05); max-height: 120px; overflow-y: auto;" id="detailAsciiPayload"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let currentSessionId = {{ selected_session_id or 'null' }};
+</script>
+<script src="{{ url_for('static', filename='js/inspector.js') }}"></script>
+{% endblock %}

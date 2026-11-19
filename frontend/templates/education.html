@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block title %}Learn Networking - Educational Module{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header Banner -->
+  <div class="cyber-card p-4 mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="rounded-3 p-3 d-inline-block" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border-color);">
+        <i class="bi bi-mortarboard fs-1 text-cyan"></i>
+      </div>
+      <div>
+        <h6 class="text-uppercase text-cyan fw-bold font-mono mb-1">Foundational Cybersecurity & Networking</h6>
+        <h2 class="fw-bold text-white mb-1">Learn Networking: Concepts, Models & Packets</h2>
+        <p class="text-muted small mb-0">
+          A beginner-friendly guide covering packet fundamentals, network protocols, the 7-layer OSI model, and ethical sniffing.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 Core Networking Concepts Grid -->
+  <div class="row g-4 mb-5">
+    
+    <!-- 1. What is a Network Packet? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">01</span>
+          <h4 class="text-white fw-bold mb-0">What is a Network Packet?</h4>
+        </div>
+        <p class="text-secondary small">
+          A <strong>network packet</strong> is the basic formatted unit of data carried by a packet-switched network. Rather than sending a large file as a continuous stream, data is broken down into small, manageable chunks called packets.
+        </p>
+        <div class="p-3 rounded font-mono small text-cyan mb-2" style="background: #040711; border: 1px solid rgba(0, 240, 255, 0.2);">
+          [ Header (Metadata/Routing) ] + [ Payload (Data) ] + [ Trailer (Error Check) ]
+        </div>
+        <p class="text-muted small mb-0">
+          Headers contain essential addressing information (Source IP, Destination IP, Ports, Sequence Numbers), enabling intermediate routers and switches to forward the packet accurately to its target destination.
+        </p>
+      </div>
+    </div>
+
+    <!-- 2. What is Packet Sniffing? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">02</span>
+          <h4 class="text-white fw-bold mb-0">What is Packet Sniffing?</h4>
+        </div>
+        <p class="text-secondary small">
+          <strong>Packet sniffing</strong> (or packet capturing) is the process of intercepting and logging data packets that traverse a computer network. 
+        </p>
+        <ul class="text-secondary small ps-3 mb-2">
+          <li><strong>Legitimate & Defensive:</strong> Network troubleshooting, diagnosing packet loss, performance tuning, and intrusion detection (IDS/IPS).</li>
+          <li><strong>Promiscuous Mode:</strong> Instructs the Network Interface Card (NIC) to pass all received frames to the OS rather than only frames addressed to its own MAC address.</li>
+        </ul>
+        <div class="alert alert-dark border-secondary-subtle py-2 px-3 small font-mono text-amber mb-0">
+          <i class="bi bi-shield-exclamation me-1"></i> Ethical Rule: Only sniff networks you own or have explicit written authorization to monitor.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. What is an IP Address? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">03</span>
+          <h4 class="text-white fw-bold mb-0">What is an IP Address?</h4>
+        </div>
+        <p class="text-secondary small">
+          An <strong>Internet Protocol (IP) address</strong> is a logical numerical label assigned to each device connected to a computer network that uses the IP for communication.
+        </p>
+        <div class="row g-2 font-mono small mb-2">
+          <div class="col-6">
+            <div class="p-2 rounded bg-dark border border-secondary text-cyan">
+              <strong>IPv4 (32-bit):</strong><br>
+              <code>192.168.1.100</code><br>
+              4 octets, ~4.3 billion total addresses.
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded bg-dark border border-secondary text-purple">
+              <strong>IPv6 (128-bit):</strong><br>
+              <code>2001:db8::1</code><br>
+              Hexadecimal, practically limitless space.
+            </div>
+          </div>
+        </div>
+        <p class="text-muted small mb-0">
+          IP addresses operate at Layer 3 (Network Layer) and are routable across multiple networks and the global Internet.
+        </p>
+      </div>
+    </div>
+
+    <!-- 4. What is a MAC Address? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">04</span>
+          <h4 class="text-white fw-bold mb-0">What is a MAC Address?</h4>
+        </div>
+        <p class="text-secondary small">
+          A <strong>Media Access Control (MAC) address</strong> is a unique physical hardware identifier permanently assigned to a Network Interface Card (NIC) by its manufacturer.
+        </p>
+        <div class="p-3 rounded font-mono small text-secondary mb-2" style="background: #040711; border: 1px solid rgba(255, 255, 255, 0.1);">
+          Format: <span class="text-cyan">00:1A:2B</span>:<span class="text-white">3C:4D:5E</span> (48 bits / 6 octets)<br>
+          <span class="text-cyan">00:1A:2B</span> = Organizationally Unique Identifier (OUI - Manufacturer)<br>
+          <span class="text-white">3C:4D:5E</span> = Device Network Interface Controller ID
+        </div>
+        <p class="text-muted small mb-0">
+          MAC addresses operate at Layer 2 (Data Link Layer) and are used exclusively within local broadcast domains (LANs). They do not route across the Internet.
+        </p>
+      </div>
+    </div>
+
+    <!-- 5. What is a Port Number? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">05</span>
+          <h4 class="text-white fw-bold mb-0">What is a Port Number?</h4>
+        </div>
+        <p class="text-secondary small">
+          A <strong>port number</strong> is a 16-bit integer (ranging from <code>0</code> to <code>65,535</code>) used by transport layer protocols (TCP and UDP) to identify specific application processes or network services on a host.
+        </p>
+        <ul class="text-secondary small ps-3 mb-0">
+          <li><strong>Well-Known Ports (0 – 1023):</strong> Assigned to standard system services (Port 80 HTTP, 443 HTTPS, 22 SSH, 53 DNS).</li>
+          <li><strong>Registered Ports (1024 – 49151):</strong> Vendor and application registered (Port 3306 MySQL, 5000 Flask).</li>
+          <li><strong>Dynamic / Ephemeral Ports (49152 – 65535):</strong> Temporarily chosen by client operating systems for outgoing sessions.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 6. What is TCP? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">06</span>
+          <h4 class="text-white fw-bold mb-0">What is TCP?</h4>
+        </div>
+        <p class="text-secondary small">
+          <strong>Transmission Control Protocol (TCP)</strong> is a connection-oriented, reliable transport protocol that guarantees ordered, error-checked packet delivery.
+        </p>
+        <p class="text-secondary small">
+          Before data transmission begins, client and server establish a session using the <strong>3-Way Handshake</strong>:
+          <span class="text-cyan">SYN</span> &rarr; <span class="text-purple">SYN-ACK</span> &rarr; <span class="text-green">ACK</span>.
+        </p>
+        <p class="text-muted small mb-0">
+          If packets are dropped or damaged during transit, TCP's sliding window flow control detects missing sequence numbers and retransmits them automatically.
+        </p>
+      </div>
+    </div>
+
+    <!-- 7. What is UDP? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">07</span>
+          <h4 class="text-white fw-bold mb-0">What is UDP?</h4>
+        </div>
+        <p class="text-secondary small">
+          <strong>User Datagram Protocol (UDP)</strong> is a connectionless transport protocol that transmits data packets ("datagrams") without establishing a prior connection, handshake, or acknowledgment feedback.
+        </p>
+        <p class="text-secondary small">
+          It provides extremely low latency and minimal header overhead (only 8 bytes compared to TCP's 20-60 bytes).
+        </p>
+        <p class="text-muted small mb-0">
+          Ideal for time-critical applications like live gaming, VoIP streaming, and DNS where an occasional dropped packet is preferable to waiting for retransmissions.
+        </p>
+      </div>
+    </div>
+
+    <!-- 8. What is ICMP? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">08</span>
+          <h4 class="text-white fw-bold mb-0">What is ICMP?</h4>
+        </div>
+        <p class="text-secondary small">
+          <strong>Internet Control Message Protocol (ICMP)</strong> is a supporting protocol in the Internet protocol suite used by routers and hosts to communicate error conditions and operational diagnostics.
+        </p>
+        <p class="text-secondary small">
+          ICMP does not use port numbers; it is encapsulated directly in IP datagrams (IP Protocol 1).
+        </p>
+        <p class="text-muted small mb-0">
+          Common uses: <code>ping</code> sends ICMP Type 8 (Echo Request) and listens for Type 0 (Echo Reply). <code>traceroute</code> maps routes by deliberately triggering ICMP Type 11 (TTL Exceeded) messages.
+        </p>
+      </div>
+    </div>
+
+    <!-- 9. What is DNS? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">09</span>
+          <h4 class="text-white fw-bold mb-0">What is DNS?</h4>
+        </div>
+        <p class="text-secondary small">
+          The <strong>Domain Name System (DNS)</strong> is a distributed hierarchical naming system that resolves human-readable hostnames (such as <code>packetscope.local</code>) into machine-routable IP addresses.
+        </p>
+        <p class="text-secondary small">
+          Resolvers query DNS servers across a hierarchy:
+          <strong>Root Servers</strong> &rarr; <strong>TLD Servers (.com, .org)</strong> &rarr; <strong>Authoritative Servers</strong>.
+        </p>
+        <p class="text-muted small mb-0">
+          Core record types include: <strong>A</strong> (IPv4 address), <strong>AAAA</strong> (IPv6 address), <strong>CNAME</strong> (alias), <strong>MX</strong> (mail server), and <strong>PTR</strong> (reverse lookup).
+        </p>
+      </div>
+    </div>
+
+    <!-- 10. What is the OSI Model? -->
+    <div class="col-lg-6">
+      <div class="cyber-card p-4 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary font-mono">10</span>
+          <h4 class="text-white fw-bold mb-0">What is the OSI Model?</h4>
+        </div>
+        <p class="text-secondary small">
+          The <strong>Open Systems Interconnection (OSI) model</strong> is a conceptual framework that standardizes the communication functions of a telecommunication or computing system into 7 distinct abstraction layers.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-cyber table-sm font-mono small">
+            <thead><tr><th>#</th><th>Layer</th><th>Protocol Unit & Examples</th></tr></thead>
+            <tbody>
+              <tr><td>7</td><td class="text-cyan">Application</td><td>HTTP, DNS, SSH, FTP, SMTP</td></tr>
+              <tr><td>6</td><td class="text-secondary">Presentation</td><td>SSL/TLS, JPEG, ASCII, Encryption</td></tr>
+              <tr><td>5</td><td class="text-secondary">Session</td><td>Sockets, RPC, NetBIOS</td></tr>
+              <tr><td>4</td><td class="text-purple">Transport</td><td>Segments / Datagrams (TCP, UDP)</td></tr>
+              <tr><td>3</td><td class="text-amber">Network</td><td>Packets (IPv4, IPv6, ICMP, Routing)</td></tr>
+              <tr><td>2</td><td class="text-green">Data Link</td><td>Frames (Ethernet, MAC, ARP, Switches)</td></tr>
+              <tr><td>1</td><td class="text-muted">Physical</td><td>Bits, Cables, Fiber, Radio Waves</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Knowledge Quiz Section -->
+  <div class="cyber-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary-subtle pb-3">
+      <div>
+        <h4 class="text-white fw-bold mb-1"><i class="bi bi-patch-question text-cyan me-2"></i> Interactive Networking Quiz</h4>
+        <p class="text-muted small mb-0">Test your comprehension of network protocols, header structures, and packet analysis.</p>
+      </div>
+      <div class="text-end">
+        <span class="badge bg-dark border border-secondary text-cyan font-mono fs-6" id="quizScoreBadge">Score: 0 / 5</span>
+      </div>
+    </div>
+
+    <form id="quizForm" onsubmit="event.preventDefault(); evaluateQuiz();">
+      <!-- Question 1 -->
+      <div class="mb-4 p-3 rounded" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);">
+        <h6 class="text-white fw-bold mb-2">1. Which TCP flag combination indicates the initial step of the 3-Way Handshake?</h6>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q1" id="q1a" value="wrong">
+          <label class="form-check-label" for="q1a">ACK</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q1" id="q1b" value="correct">
+          <label class="form-check-label" for="q1b">SYN</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q1" id="q1c" value="wrong">
+          <label class="form-check-label" for="q1c">FIN-ACK</label>
+        </div>
+        <div class="form-check font-mono small text-secondary">
+          <input class="form-check-input" type="radio" name="q1" id="q1d" value="wrong">
+          <label class="form-check-label" for="q1d">RST</label>
+        </div>
+        <div class="quiz-feedback small font-mono mt-2" id="q1Feedback"></div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="mb-4 p-3 rounded" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);">
+        <h6 class="text-white fw-bold mb-2">2. What layer of the OSI model does an IP address operate at?</h6>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q2" id="q2a" value="wrong">
+          <label class="form-check-label" for="q2a">Layer 2 (Data Link Layer)</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q2" id="q2b" value="correct">
+          <label class="form-check-label" for="q2b">Layer 3 (Network Layer)</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q2" id="q2c" value="wrong">
+          <label class="form-check-label" for="q2c">Layer 4 (Transport Layer)</label>
+        </div>
+        <div class="form-check font-mono small text-secondary">
+          <input class="form-check-input" type="radio" name="q2" id="q2d" value="wrong">
+          <label class="form-check-label" for="q2d">Layer 7 (Application Layer)</label>
+        </div>
+        <div class="quiz-feedback small font-mono mt-2" id="q2Feedback"></div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="mb-4 p-3 rounded" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);">
+        <h6 class="text-white fw-bold mb-2">3. Why does DNS typically use UDP port 53 for standard queries rather than TCP?</h6>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q3" id="q3a" value="correct">
+          <label class="form-check-label" for="q3a">UDP has lower overhead and latency without needing connection setup handshakes.</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q3" id="q3b" value="wrong">
+          <label class="form-check-label" for="q3b">UDP guarantees 100% encrypted packet transport.</label>
+        </div>
+        <div class="form-check font-mono small text-secondary">
+          <input class="form-check-input" type="radio" name="q3" id="q3c" value="wrong">
+          <label class="form-check-label" for="q3c">TCP cannot handle domain names longer than 16 characters.</label>
+        </div>
+        <div class="quiz-feedback small font-mono mt-2" id="q3Feedback"></div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="mb-4 p-3 rounded" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);">
+        <h6 class="text-white fw-bold mb-2">4. Which protocol resolves an IP address to a physical MAC address on a local network?</h6>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q4" id="q4a" value="wrong">
+          <label class="form-check-label" for="q4a">DHCP</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q4" id="q4b" value="correct">
+          <label class="form-check-label" for="q4b">ARP (Address Resolution Protocol)</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q4" id="q4c" value="wrong">
+          <label class="form-check-label" for="q4c">ICMP</label>
+        </div>
+        <div class="form-check font-mono small text-secondary">
+          <input class="form-check-input" type="radio" name="q4" id="q4d" value="wrong">
+          <label class="form-check-label" for="q4d">SNMP</label>
+        </div>
+        <div class="quiz-feedback small font-mono mt-2" id="q4Feedback"></div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="mb-4 p-3 rounded" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color);">
+        <h6 class="text-white fw-bold mb-2">5. What is the default header size of a User Datagram Protocol (UDP) segment?</h6>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q5" id="q5a" value="correct">
+          <label class="form-check-label" for="q5a">8 Bytes</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q5" id="q5b" value="wrong">
+          <label class="form-check-label" for="q5b">20 Bytes</label>
+        </div>
+        <div class="form-check font-mono small text-secondary mb-1">
+          <input class="form-check-input" type="radio" name="q5" id="q5c" value="wrong">
+          <label class="form-check-label" for="q5c">32 Bytes</label>
+        </div>
+        <div class="form-check font-mono small text-secondary">
+          <input class="form-check-input" type="radio" name="q5" id="q5d" value="wrong">
+          <label class="form-check-label" for="q5d">64 Bytes</label>
+        </div>
+        <div class="quiz-feedback small font-mono mt-2" id="q5Feedback"></div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-cyber-primary px-4">
+          <i class="bi bi-check2-circle me-1"></i> Submit Quiz Answers
+        </button>
+        <button type="button" class="btn btn-outline-secondary" onclick="resetQuiz()">
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function evaluateQuiz() {
+  let score = 0;
+  const questions = [
+    { name: 'q1', explanation: 'Correct! SYN (Synchronize) initiates the 3-Way Handshake.' },
+    { name: 'q2', explanation: 'Correct! IP addressing operates at Layer 3 (Network Layer).' },
+    { name: 'q3', explanation: 'Correct! UDP provides low overhead and minimal latency for DNS query packets.' },
+    { name: 'q4', explanation: 'Correct! ARP translates IP addresses to MAC addresses on local LANs.' },
+    { name: 'q5', explanation: 'Correct! UDP headers are exactly 8 bytes fixed (Source Port, Dest Port, Length, Checksum).' }
+  ];
+
+  questions.forEach((q, idx) => {
+    const qNum = idx + 1;
+    const selected = document.querySelector(`input[name="${q.name}"]:checked`);
+    const fb = document.getElementById(`q${qNum}Feedback`);
+
+    if (!selected) {
+      fb.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Please select an option.</span>';
+      return;
+    }
+
+    if (selected.value === 'correct') {
+      score++;
+      fb.innerHTML = `<span class="text-green"><i class="bi bi-check-circle-fill"></i> ${q.explanation}</span>`;
+    } else {
+      fb.innerHTML = `<span class="text-red"><i class="bi bi-x-circle-fill"></i> Incorrect answer. Review the concept above.</span>`;
+    }
+  });
+
+  const scoreBadge = document.getElementById('quizScoreBadge');
+  scoreBadge.textContent = `Score: ${score} / ${questions.length}`;
+  scoreBadge.className = score >= 4 ? 'badge bg-success font-mono fs-6' : 'badge bg-primary font-mono fs-6';
+
+  showAlert(`Quiz Evaluated: ${score} out of ${questions.length} correct!`, score >= 4 ? 'success' : 'info');
+}
+
+function resetQuiz() {
+  document.getElementById('quizForm').reset();
+  document.querySelectorAll('.quiz-feedback').forEach(el => el.innerHTML = '');
+  document.getElementById('quizScoreBadge').textContent = 'Score: 0 / 5';
+}
+</script>
+{% endblock %}

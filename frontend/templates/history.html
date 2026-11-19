@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Capture History & Reports{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header Banner -->
+  <div class="cyber-card p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-3 p-3 d-inline-block" style="background: rgba(0, 240, 255, 0.1); border: 1px solid var(--border-color);">
+          <i class="bi bi-clock-history fs-1 text-cyan"></i>
+        </div>
+        <div>
+          <h6 class="text-uppercase text-cyan fw-bold font-mono mb-1">Session Management & Reporting</h6>
+          <h2 class="fw-bold text-white mb-1">Capture History & Reports</h2>
+          <p class="text-muted small mb-0">
+            Review past monitoring sessions, inspect historical packets, and export professional PDF/CSV reports.
+          </p>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('views.dashboard') }}" class="btn btn-sm btn-cyber-primary">
+          <i class="bi bi-broadcast me-1"></i> New Live Capture
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions Table -->
+  <div class="cyber-card">
+    <div class="cyber-card-header d-flex justify-content-between align-items-center">
+      <span class="fw-bold text-white small font-mono">
+        <i class="bi bi-database text-cyan me-1"></i> Recorded Capture Sessions
+        <span class="badge bg-dark border border-secondary text-cyan ms-2">{{ sessions|length }} Sessions</span>
+      </span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-cyber table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width: 60px;">ID</th>
+            <th>Session Name</th>
+            <th>Interface / Source</th>
+            <th>Start Time</th>
+            <th>Packets</th>
+            <th>Status</th>
+            <th>Protocol Summary</th>
+            <th class="text-end" style="width: 280px;">Actions & Exports</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if sessions %}
+            {% for s in sessions %}
+            <tr id="session-row-{{ s.id }}">
+              <td class="font-mono text-cyan fw-bold">#{{ s.id }}</td>
+              <td class="fw-bold text-white">
+                <a href="{{ url_for('views.dashboard', session_id=s.id) }}" class="text-decoration-none text-white hover-cyan">
+                  {{ s.name }}
+                </a>
+                {% if s.filter_applied and s.filter_applied != 'None' and s.filter_applied != 'ALL' %}
+                  <span class="badge bg-secondary font-mono ms-1" style="font-size: 0.65rem;">Filter: {{ s.filter_applied }}</span>
+                {% endif %}
+              </td>
+              <td class="font-mono small text-muted">{{ s.interface }}</td>
+              <td class="font-mono small text-secondary">{{ s.start_time[:19].replace('T', ' ') }}</td>
+              <td class="font-mono text-cyan fw-bold">{{ s.total_packets }}</td>
+              <td>
+                {% if s.status == 'running' %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle font-mono">Running</span>
+                {% elif s.status == 'completed' %}
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-mono">Completed</span>
+                {% elif s.status == 'imported' %}
+                  <span class="badge bg-info-subtle text-info border border-info-subtle font-mono">PCAP Import</span>
+                {% else %}
+                  <span class="badge bg-secondary font-mono">{{ s.status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex flex-wrap gap-1">
+                  {% if s.tcp_count %}<span class="badge-proto badge-tcp" style="font-size: 0.65rem;">TCP: {{ s.tcp_count }}</span>{% endif %}
+                  {% if s.udp_count %}<span class="badge-proto badge-udp" style="font-size: 0.65rem;">UDP: {{ s.udp_count }}</span>{% endif %}
+                  {% if s.icmp_count %}<span class="badge-proto badge-icmp" style="font-size: 0.65rem;">ICMP: {{ s.icmp_count }}</span>{% endif %}
+                  {% if s.dns_count %}<span class="badge-proto badge-dns" style="font-size: 0.65rem;">DNS: {{ s.dns_count }}</span>{% endif %}
+                  {% if s.http_count %}<span class="badge-proto badge-http" style="font-size: 0.65rem;">HTTP: {{ s.http_count }}</span>{% endif %}
+                </div>
+              </td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('views.dashboard', session_id=s.id) }}" class="btn btn-outline-secondary" title="View in Dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                  </a>
+                  <a href="{{ url_for('views.inspector', session_id=s.id) }}" class="btn btn-outline-secondary" title="Inspect Packets">
+                    <i class="bi bi-search"></i>
+                  </a>
+                  <a href="/api/export/csv/{{ s.id }}" class="btn btn-outline-secondary" title="Export CSV">
+                    <i class="bi bi-filetype-csv text-cyan"></i>
+                  </a>
+                  <a href="/api/export/pdf/{{ s.id }}" class="btn btn-outline-secondary" title="Export PDF Cybersecurity Report">
+                    <i class="bi bi-filetype-pdf text-amber"></i>
+                  </a>
+                  {% if s.pcap_path %}
+                  <a href="/api/export/pcap/{{ s.id }}" class="btn btn-outline-secondary" title="Download PCAP File">
+                    <i class="bi bi-download text-green"></i>
+                  </a>
+                  {% endif %}
+                  <button class="btn btn-outline-danger" onclick="deleteSession({{ s.id }})" title="Delete Session">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2 text-cyan opacity-50"></i>
+                No historical capture sessions found in database.<br>
+                Start a live capture session or import a PCAP to build capture history.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function deleteSession(id) {
+  if (!confirm(`Are you sure you want to permanently delete Session #${id} and all its packet metadata?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/sessions/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      const row = document.getElementById(`session-row-${id}`);
+      if (row) row.remove();
+      showAlert(`Session #${id} deleted successfully.`, 'info');
+    } else {
+      showAlert('Failed to delete session.', 'error');
+    }
+  } catch (err) {
+    showAlert('Network error deleting session.', 'error');
+  }
+}
+</script>
+{% endblock %}
